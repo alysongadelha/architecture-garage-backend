@@ -1,4 +1,4 @@
-import express from "express";
+const express = require("express");
 const {
   addProject,
   getAllProjects,
@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.post("/projects", addProject);
+router.post("/project", addProject);
 router.get("/projects", getAllProjects);
 router.get("/project/:projectId", getProject);
 router.put("/project/:projectId", updateProject);

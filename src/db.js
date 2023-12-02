@@ -1,5 +1,5 @@
 var admin = require("firebase-admin");
-import configs from "./config";
+const configs = require("./config");
 
 const serviceAccount = JSON.parse(configs.serviceAccount);
 const db = admin.initializeApp({

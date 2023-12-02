@@ -1,7 +1,6 @@
 "use strict";
-import * as dotenv from "dotenv";
-import assert from "assert";
-dotenv.config();
+require("dotenv").config();
+const assert = require("assert");
 
 const { PORT, HOST, HOST_URL, FIREBASE_SERVICE_KEY } = process.env;
 
@@ -15,4 +14,4 @@ const configs = {
   serviceAccount: FIREBASE_SERVICE_KEY,
 };
 
-export default configs;
+module.exports = configs;

@@ -1,4 +1,4 @@
-const getAssetValue = (assets: any[], key: string): string => {
+const getAssetValue = (assets, key) => {
   const assetValue = assets.find((asset) => asset.alt === key);
   return assetValue.iconValue;
 };
