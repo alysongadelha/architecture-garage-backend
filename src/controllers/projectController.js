@@ -1,20 +1,17 @@
-import { NextFunction, Request, Response } from "express";
-import { ProjectSlimType, ProjectType } from "../models/project";
-
 const firebase = require("../db");
 const { Project, ProjectSlim } = require("../models/project");
 const { getAssetValue } = require("../utils/helper.util");
 const firestore = firebase.firestore();
 const { v4: uuidv4 } = require("uuid");
 
-const addProject = async (req: Request, res: Response, next: NextFunction) => {
+const addProject = async (req, res, next) => {
   try {
     const createdAt = String(new Date());
-    const data: ProjectType = { ...req.body, createdAt };
+    const data = { ...req.body, createdAt };
     const id = uuidv4();
     await firestore.collection("projectDetail").doc(id).set(data);
 
-    const newProjectSlim: ProjectSlimType = {
+    const newProjectSlim = {
       id: uuidv4(),
       projectId: id,
       baths: getAssetValue(data.assets, "bathsIcon"),
@@ -30,26 +27,22 @@ const addProject = async (req: Request, res: Response, next: NextFunction) => {
 
     await firestore.collection("projects").doc().set(newProjectSlim);
     res.send("Record saved successfully");
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).send(error.message || error);
   }
 };
 
-const getAllProjects = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getAllProjects = async (req, res, next) => {
   try {
     const projects = firestore.collection("projects");
     const data = await projects.get();
-    const projectSlimArray: ProjectSlimType[] = [];
+    const projectSlimArray = [];
 
     if (data.empty) {
       res.status(404).send();
     } else {
-      data.forEach((doc: any) => {
-        const projectSlim: ProjectSlimType = new ProjectSlim(
+      data.forEach((doc) => {
+        const projectSlim = new ProjectSlim(
           doc.id,
           doc.data().projectId,
           doc.data().name,
@@ -67,12 +60,12 @@ const getAllProjects = async (
       });
       res.send(projectSlimArray);
     }
-  } catch (error: any) {
+  } catch (error) {
     res.status(500).send(error.message || error);
   }
 };
 
-const getProject = async (req: Request, res: Response, next: NextFunction) => {
+const getProject = async (req, res, next) => {
   try {
     const id = req.params.projectId;
     const project = firestore.collection("projectDetail").doc(id);
@@ -87,15 +80,11 @@ const getProject = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const updateProject = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const updateProject = async (req, res, next) => {
   try {
     const id = req.params.projectId;
     const data = req.body;
-    const projectSlimArray: ProjectSlimType[] = [];
+    const projectSlimArray = [];
 
     if (data === null) {
       res.status(404).send(`Request with ID ${id} without body`);
@@ -112,8 +101,8 @@ const updateProject = async (
         .status(404)
         .send(`Request with ID ${id} no matching documents to projects`);
     } else {
-      projectsData.forEach((doc: any) => {
-        const projectSlim: ProjectSlimType = new ProjectSlim(
+      projectsData.forEach((doc) => {
+        const projectSlim = new ProjectSlim(
           doc.id,
           doc.data().projectId,
           doc.data().name,
@@ -139,7 +128,7 @@ const updateProject = async (
         .status(404)
         .send(`Request with ID ${id} no matching documents to projects`);
     } else {
-      const newProjectSlim: ProjectSlimType = {
+      const newProjectSlim = {
         id: projectToUpdate.id,
         projectId: id,
         baths: getAssetValue(data.assets, "bathsIcon"),
@@ -162,11 +151,7 @@ const updateProject = async (
   }
 };
 
-const deleteProject = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const deleteProject = async (req, res, next) => {
   try {
     const id = req.params.projectId;
     await firestore.collection("projectDetail").doc(id).delete();
@@ -177,14 +162,13 @@ const deleteProject = async (
       .where("projectId", "==", id)
       .get();
     if (projectsData.empty) {
-      res.send("Record Project deleted successfully, ProjectSlim didnt exist");
+      res.send(`The Project with Id ${id} do not exist`);
     } else {
       projectsData.forEach(async (project) => {
         await projectRef.doc(project.id).delete();
       });
+      res.send("Record deleted successfully");
     }
-
-    res.send("Record deleted successfully");
   } catch (error) {
     res.status(500).send(error.message || error);
   }
